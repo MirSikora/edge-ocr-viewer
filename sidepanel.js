@@ -2,6 +2,7 @@ const statusEl = document.getElementById('status');
 const textEl = document.getElementById('text');
 const selectBtn = document.getElementById('select');
 const fixHyphensBtn = document.getElementById('fixHyphens');
+const makeContinuousBtn = document.getElementById('makeContinuous');
 const copyBtn = document.getElementById('copy');
 const clearBtn = document.getElementById('clear');
 
@@ -16,6 +17,7 @@ function updateButtons() {
   selectBtn.disabled = selecting;
   const hasText = textEl.value.trim().length > 0;
   fixHyphensBtn.disabled = !hasText;
+  makeContinuousBtn.disabled = !hasText;
   copyBtn.disabled = !hasText;
   clearBtn.disabled = !hasText;
 }
@@ -27,6 +29,16 @@ textEl.addEventListener('input', updateButtons);
 // dvěma písmeny, zůstanou beze změny.
 function dehyphenate(text) {
   return text.replace(/([\p{L}])-[ \t]*\r?\n[ \t]*([\p{L}])/gu, '$1$2');
+}
+
+// Spojí všechny zalomené řádky (včetně prázdných řádků mezi odstavci) do
+// jednoho souvislého textu - nejdřív doplní rozdělená slova, pak nahradí
+// zbylé konce řádků mezerou.
+function makeContinuous(text) {
+  return dehyphenate(text)
+    .replace(/[ \t]*\r?\n[ \t]*/g, ' ')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
 }
 
 function appendText(newText) {
@@ -251,6 +263,18 @@ fixHyphensBtn.addEventListener('click', () => {
   textEl.value = after;
   updateButtons();
   setStatus('Rozdělená slova spojena.');
+});
+
+makeContinuousBtn.addEventListener('click', () => {
+  const before = textEl.value;
+  const after = makeContinuous(before);
+  if (after === before.trim()) {
+    setStatus('Text už je souvislý.');
+    return;
+  }
+  textEl.value = after;
+  updateButtons();
+  setStatus('Text spojen do souvislého odstavce.');
 });
 
 copyBtn.addEventListener('click', async () => {
