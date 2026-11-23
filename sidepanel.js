@@ -1,8 +1,9 @@
 const statusEl = document.getElementById('status');
-const textEl = document.getElementById('text');
+let textEl = document.getElementById('text');
 const selectBtn = document.getElementById('select');
 const fixHyphensBtn = document.getElementById('fixHyphens');
 const makeContinuousBtn = document.getElementById('makeContinuous');
+const removePipesBtn = document.getElementById('removePipes');
 const copyBtn = document.getElementById('copy');
 const clearBtn = document.getElementById('clear');
 
@@ -18,6 +19,7 @@ function updateButtons() {
   const hasText = textEl.value.trim().length > 0;
   fixHyphensBtn.disabled = !hasText;
   makeContinuousBtn.disabled = !hasText;
+  removePipesBtn.disabled = !hasText;
   copyBtn.disabled = !hasText;
   clearBtn.disabled = !hasText;
 }
@@ -41,6 +43,25 @@ function makeContinuous(text) {
     .trim();
 }
 
+// Odstraní osamocené znaky "|" - typický OCR artefakt, kdy Tesseract
+// přečte svislou oddělovací linku mezi sloupci (nebo šum na okraji výběru)
+// jako znak roury. Mezera kolem "|" se smrskne na jednu, aby text zůstal
+// čitelný.
+function removeStrayPipes(text) {
+  return text
+    .replace(/[ \t]*\|+[ \t]*/g, ' ')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .trim();
+}
+
+// Pravopisnou kontrolu v Chromium/Edge spouští jen skutečná uživatelská
+// interakce s polem (klik, psaní, scroll) - jakýkoliv pokus vynutit ji
+// skriptem (focus/blur/select) se ukázal jako nespolehlivý až škodlivý
+// (mazal už zobrazené podtržení, aniž by spustil nové). Proto se text
+// vkládá čistě přes .value a kontrolu pravopisu necháváme zcela na
+// prohlížeči - stačí do textu kliknout nebo jím přejet kolečkem myši.
 function appendText(newText) {
   const trimmed = (newText || '').trim();
   if (!trimmed) return;
@@ -275,6 +296,18 @@ makeContinuousBtn.addEventListener('click', () => {
   textEl.value = after;
   updateButtons();
   setStatus('Text spojen do souvislého odstavce.');
+});
+
+removePipesBtn.addEventListener('click', () => {
+  const before = textEl.value;
+  const after = removeStrayPipes(before);
+  if (after === before.trim()) {
+    setStatus('Žádný znak | nenalezen.');
+    return;
+  }
+  textEl.value = after;
+  updateButtons();
+  setStatus('Znaky | odstraněny.');
 });
 
 copyBtn.addEventListener('click', async () => {
