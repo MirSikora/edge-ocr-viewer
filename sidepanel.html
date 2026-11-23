@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8" />
+<title>OCR obrázků</title>
+<link rel="stylesheet" href="sidepanel.css" />
+</head>
+<body>
+  <header>
+    <button id="select" title="Vybrat oblast na stránce k naskenování">✂ Vybrat oblast</button>
+    <button id="fixHyphens" disabled title="Spojit slova rozdělená pomlčkou na konci řádku">🔧 Spojit dělení</button>
+    <button id="copy" disabled title="Zkopírovat text">⎘ Kopírovat</button>
+    <button id="clear" disabled title="Vymazat text">🗑 Vymazat</button>
+  </header>
+  <div id="status"></div>
+  <textarea id="text" spellcheck="false" placeholder="Rozpoznaný text z vybraných oblastí se bude postupně přidávat sem. Text lze přímo upravovat."></textarea>
+
+  <script src="vendor/tesseract.min.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

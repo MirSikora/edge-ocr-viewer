@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "OCR Viewer",
+  "version": "1.0.0",
+  "description": "Prohledá obrázky na stránce a lokálně (offline, bez odesílání dat) z nich postupně vytáhne text do postranního panelu.",
+  "permissions": ["scripting", "sidePanel", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Rozpoznat text v obrázcích",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
+}
